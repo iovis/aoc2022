@@ -18,14 +18,27 @@ pub fn main() -> Result<()> {
     color_eyre::install()?;
 
     let input = include_str!("input.txt");
-    let a1 = p1(input);
 
+    let a1 = p1(input);
     println!("{a1:?}");
+
+    let a2 = p2(input);
+    println!("{a2:?}");
 
     Ok(())
 }
 
 fn p1(input: &str) -> usize {
+    input
+        .lines()
+        .map(|line| line.split_once(' ').unwrap())
+        .map(|moves| (Symbol::from(moves.0), Symbol::from(moves.1)))
+        .map(Outcome::from)
+        .map(<usize>::from)
+        .sum()
+}
+
+fn p2(input: &str) -> usize {
     input
         .lines()
         .map(|line| line.split_once(' ').unwrap())
@@ -61,9 +74,37 @@ enum Outcome {
 
 impl From<(&str, &str)> for Outcome {
     fn from(value: (&str, &str)) -> Self {
-        let game = (Symbol::from(value.0), Symbol::from(value.1));
+        let opponent_symbol = Symbol::from(value.0);
+        let desired_outcome = value.1;
 
-        match game {
+        match (opponent_symbol, desired_outcome) {
+            (symbol, "Y") => Outcome::Draw { symbol },
+            (Symbol::Rock, "X") => Outcome::Loss {
+                symbol: Symbol::Scissors,
+            },
+            (Symbol::Rock, "Z") => Outcome::Win {
+                symbol: Symbol::Paper,
+            },
+            (Symbol::Paper, "X") => Outcome::Loss {
+                symbol: Symbol::Rock,
+            },
+            (Symbol::Paper, "Z") => Outcome::Win {
+                symbol: Symbol::Scissors,
+            },
+            (Symbol::Scissors, "X") => Outcome::Loss {
+                symbol: Symbol::Paper,
+            },
+            (Symbol::Scissors, "Z") => Outcome::Win {
+                symbol: Symbol::Rock,
+            },
+            wat => panic!("Weird combo: {:?}", wat),
+        }
+    }
+}
+
+impl From<(Symbol, Symbol)> for Outcome {
+    fn from(value: (Symbol, Symbol)) -> Self {
+        match value {
             (Symbol::Rock, symbol @ Symbol::Rock) => Self::Draw { symbol },
             (Symbol::Rock, symbol @ Symbol::Paper) => Self::Win { symbol },
             (Symbol::Rock, symbol @ Symbol::Scissors) => Self::Loss { symbol },
@@ -110,20 +151,20 @@ mod tests {
         let games = [
             (
                 ("A", "X"),
+                Outcome::Loss {
+                    symbol: Symbol::Scissors,
+                },
+            ),
+            (
+                ("A", "Y"),
                 Outcome::Draw {
                     symbol: Symbol::Rock,
                 },
             ),
             (
-                ("A", "Y"),
+                ("A", "Z"),
                 Outcome::Win {
                     symbol: Symbol::Paper,
-                },
-            ),
-            (
-                ("A", "Z"),
-                Outcome::Loss {
-                    symbol: Symbol::Scissors,
                 },
             ),
             (
@@ -146,20 +187,20 @@ mod tests {
             ),
             (
                 ("C", "X"),
-                Outcome::Win {
-                    symbol: Symbol::Rock,
-                },
-            ),
-            (
-                ("C", "Y"),
                 Outcome::Loss {
                     symbol: Symbol::Paper,
                 },
             ),
             (
-                ("C", "Z"),
+                ("C", "Y"),
                 Outcome::Draw {
                     symbol: Symbol::Scissors,
+                },
+            ),
+            (
+                ("C", "Z"),
+                Outcome::Win {
+                    symbol: Symbol::Rock,
                 },
             ),
         ];
@@ -182,7 +223,7 @@ mod tests {
                 Outcome::Loss {
                     symbol: Symbol::Rock,
                 },
-                0 + 1,
+                1,
             ),
             (
                 Outcome::Win {
@@ -209,6 +250,21 @@ mod tests {
             "};
 
             assert_eq!(p1(input), 15);
+        }
+    }
+
+    mod p2 {
+        use crate::p2;
+
+        #[test]
+        fn test_example() {
+            let input = indoc::indoc! {"
+                A Y
+                B X
+                C Z
+            "};
+
+            assert_eq!(p2(input), 12);
         }
     }
 }
