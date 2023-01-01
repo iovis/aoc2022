@@ -11,12 +11,14 @@ pub fn main() -> Result<()> {
     let a1 = p1(input);
     println!("a1: {a1:?}");
 
-    // let a2 = p2(input);
-    // println!("a2: {a2:?}");
+    let a2 = p2(input);
+    println!("a2: {a2:?}");
 
     Ok(())
 }
 
+/// Find the common item per line
+/// - each line is split in two
 fn p1(input: &str) -> i32 {
     input
         .lines()
@@ -48,8 +50,17 @@ fn p1(input: &str) -> i32 {
     // sum
 }
 
+/// Find the common item between 3 lines
 fn p2(input: &str) -> i32 {
-    todo!();
+    input
+        .lines()
+        .map(|line| HashSet::<char>::from_iter(line.chars()))
+        .collect_vec()
+        .iter()
+        .tuples() // Split in groups of 3
+        .map(|(a, b, c)| find_common_badge(a, b, c))
+        .map(|c| priority(&c))
+        .sum()
 }
 
 fn priority(item: &char) -> i32 {
@@ -58,6 +69,13 @@ fn priority(item: &char) -> i32 {
     } else {
         *item as i32 - 64 + 26
     }
+}
+
+fn find_common_badge(a: &HashSet<char>, b: &HashSet<char>, c: &HashSet<char>) -> char {
+    let ab = a.intersection(b).copied();
+    let ab = HashSet::<char>::from_iter(ab);
+
+    *c.intersection(&ab).next().unwrap()
 }
 
 #[cfg(test)]
@@ -72,6 +90,15 @@ mod tests {
         assert_eq!(22, priority(&'v'));
         assert_eq!(20, priority(&'t'));
         assert_eq!(19, priority(&'s'));
+    }
+
+    #[test]
+    fn test_find_common_badge() {
+        let a = HashSet::from(['a', 'b', 'C']);
+        let b = HashSet::from(['e', 'B', 'C']);
+        let c = HashSet::from(['d', 'f', 'C']);
+
+        assert_eq!(find_common_badge(&a, &b, &c), 'C');
     }
 
     mod p1 {
@@ -93,7 +120,7 @@ mod tests {
     }
 
     mod p2 {
-        // use crate::p2;
+        use crate::p2;
 
         #[test]
         fn test_example() {
@@ -106,7 +133,7 @@ mod tests {
                 CrZsJsPPZsGzwwsLwLmpwMDw
             "};
 
-            // assert_eq!(p2(input), 157);
+            assert_eq!(p2(input), 70);
         }
     }
 }
