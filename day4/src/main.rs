@@ -11,6 +11,9 @@ pub fn main() -> Result<()> {
     let a1 = p1(input);
     println!("a1: {a1:?}");
 
+    let a2 = p2(input);
+    println!("a2: {a2:?}");
+
     Ok(())
 }
 
@@ -18,7 +21,15 @@ fn p1(input: &str) -> usize {
     input
         .lines()
         .map(parse_ranges)
-        .filter(|(a, b)| range_overlap(a, b))
+        .filter(|(a, b)| is_any_range_fully_contained(a, b))
+        .count()
+}
+
+fn p2(input: &str) -> usize {
+    input
+        .lines()
+        .map(parse_ranges)
+        .filter(|(a, b)| do_ranges_overlap(a, b))
         .count()
 }
 
@@ -40,7 +51,7 @@ fn parse_ranges(line: &str) -> (RangeInclusive<i32>, RangeInclusive<i32>){
     (r1, r2)
 }
 
-fn range_overlap(a: &RangeInclusive<i32>, b: &RangeInclusive<i32>) -> bool {
+fn is_any_range_fully_contained(a: &RangeInclusive<i32>, b: &RangeInclusive<i32>) -> bool {
     // Is a contained in b?
     if a.start() >= b.start() && a.end() <= b.end() {
         return true;
@@ -54,9 +65,21 @@ fn range_overlap(a: &RangeInclusive<i32>, b: &RangeInclusive<i32>) -> bool {
     false
 }
 
+fn do_ranges_overlap(a: &RangeInclusive<i32>, b: &RangeInclusive<i32>) -> bool {
+    if a.contains(b.start()) || a.contains(b.end()) {
+        return true;
+    }
+
+    if b.contains(a.start()) || b.contains(a.end()) {
+        return true;
+    }
+
+    false
+}
+
 #[cfg(test)]
 mod tests {
-    use crate::range_overlap;
+    use crate::is_any_range_fully_contained;
 
     use super::*;
 
@@ -65,22 +88,22 @@ mod tests {
         let a = 2..=4;
         let b = 6..=8;
 
-        assert!(!range_overlap(&a, &b));
+        assert!(!is_any_range_fully_contained(&a, &b));
 
         let a = 2..=8;
         let b = 3..=7;
 
-        assert!(range_overlap(&a, &b));
+        assert!(is_any_range_fully_contained(&a, &b));
 
         let a = 2..=6;
         let b = 4..=8;
 
-        assert!(!range_overlap(&a, &b));
+        assert!(!is_any_range_fully_contained(&a, &b));
 
         let a = 6..=6;
         let b = 4..=6;
 
-        assert!(range_overlap(&a, &b));
+        assert!(is_any_range_fully_contained(&a, &b));
     }
 
     mod p1 {
@@ -98,6 +121,24 @@ mod tests {
             "};
 
             assert_eq!(p1(input), 2);
+        }
+    }
+
+    mod p2 {
+        use crate::p2;
+
+        #[test]
+        fn test_example() {
+            let input = indoc::indoc! {"
+                2-4,6-8
+                2-3,4-5
+                5-7,7-9
+                2-8,3-7
+                6-6,4-6
+                2-6,4-8
+            "};
+
+            assert_eq!(p2(input), 4);
         }
     }
 }
