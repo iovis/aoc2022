@@ -2,6 +2,10 @@ use color_eyre::Result;
 #[allow(unused_imports)]
 use itertools::Itertools;
 
+use self::operation::{parse_operation, Operation};
+
+mod operation;
+
 pub fn main() -> Result<()> {
     color_eyre::install()?;
     let input = include_str!("input.txt");
@@ -18,7 +22,17 @@ fn p1(input: &str) -> &str {
     let containers = parse_containers(containers);
     dbg!(&containers);
 
+    let instructions = parse_instructions(instructions);
+    dbg!(&instructions);
+
     todo!();
+}
+
+fn parse_instructions(instructions: &str) -> Vec<Operation> {
+    instructions.lines()
+        .filter_map(|line| parse_operation(line).ok())
+        .map(|(_, operation)| operation)
+        .collect()
 }
 
 fn parse_containers(input: &str) -> Vec<Vec<char>> {
