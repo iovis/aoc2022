@@ -6,9 +6,9 @@ use nom::IResult;
 
 #[derive(Debug, PartialEq, Eq)]
 pub struct Operation {
-    quantity: usize,
-    src: usize,
-    dest: usize,
+    pub qty: usize,
+    pub src: usize,
+    pub dst: usize,
 }
 
 pub fn parse_operation(input: &str) -> IResult<&str, Operation> {
@@ -18,11 +18,7 @@ pub fn parse_operation(input: &str) -> IResult<&str, Operation> {
             preceded(tag(" from "), parse_container),
             preceded(tag(" to "), parse_container),
         )),
-        |(quantity, src, dest)| Operation {
-            quantity,
-            src,
-            dest,
-        },
+        |(qty, src, dst)| Operation { qty, src, dst },
     )(input)
 }
 
@@ -47,9 +43,9 @@ mod tests {
             Ok((
                 "",
                 Operation {
-                    quantity: 2,
+                    qty: 2,
                     src: 2,
-                    dest: 0,
+                    dst: 0,
                 }
             ))
         );

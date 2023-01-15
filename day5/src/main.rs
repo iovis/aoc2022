@@ -16,20 +16,33 @@ pub fn main() -> Result<()> {
     Ok(())
 }
 
-fn p1(input: &str) -> &str {
-    let (containers, instructions) = input.split_once("\n\n").unwrap();
+fn p1(input: &str) -> String {
+    let (containers, operation) = input.split_once("\n\n").unwrap();
 
-    let containers = parse_containers(containers);
-    dbg!(&containers);
+    let mut containers = parse_containers(containers);
 
-    let instructions = parse_instructions(instructions);
-    dbg!(&instructions);
+    let operations = parse_operations(operation);
 
-    todo!();
+    for operation in operations {
+        for _ in 0..operation.qty {
+            let src = operation.src;
+            let dst = operation.dst;
+
+            let tmp = containers[src].pop().unwrap();
+
+            containers[dst].push(tmp);
+        }
+    }
+
+    containers
+        .iter()
+        .filter_map(|container| container.last())
+        .collect()
 }
 
-fn parse_instructions(instructions: &str) -> Vec<Operation> {
-    instructions.lines()
+fn parse_operations(instructions: &str) -> Vec<Operation> {
+    instructions
+        .lines()
         .filter_map(|line| parse_operation(line).ok())
         .map(|(_, operation)| operation)
         .collect()
