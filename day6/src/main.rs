@@ -9,12 +9,23 @@ pub fn main() -> Result<()> {
     let a1 = p1(input);
     println!("a1: {a1:?}");
 
+    let a2 = p2(input);
+    println!("a2: {a2:?}");
+
     Ok(())
 }
 
 /// Find position of 4 consecutive unique chars
 fn p1(input: &str) -> usize {
-    let window_size = 4;
+    solver(input, 4)
+}
+
+/// Find position of 14 consecutive unique chars
+fn p2(input: &str) -> usize {
+    solver(input, 14)
+}
+
+fn solver(input: &str, window_size: usize) -> usize {
     let input = input.as_bytes();
 
     for i in 0..(input.len() - window_size) {
