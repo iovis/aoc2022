@@ -1,8 +1,6 @@
 use color_eyre::Result;
-#[allow(unused_imports)]
-use itertools::Itertools;
 
-use self::operation::{parse_operation, Operation};
+use self::operation::Operation;
 
 mod operation;
 
@@ -12,6 +10,9 @@ pub fn main() -> Result<()> {
 
     let a1 = p1(input);
     println!("a1: {a1:?}");
+
+    let a2 = p2(input);
+    println!("a2: {a2:?}");
 
     Ok(())
 }
@@ -40,10 +41,34 @@ fn p1(input: &str) -> String {
         .collect()
 }
 
+fn p2(input: &str) -> String {
+    let (containers, operation) = input.split_once("\n\n").unwrap();
+
+    let mut containers = parse_containers(containers);
+
+    let operations = parse_operations(operation);
+
+    for operation in operations {
+        let src = operation.src;
+        let dst = operation.dst;
+        let from = containers[src].len() - operation.qty;
+
+        // Have to collect otherwise it complains about double borrow mut
+        let tmp: Vec<_> = containers[src].drain(from..).collect();
+
+        containers[dst].extend(tmp);
+    }
+
+    containers
+        .iter()
+        .filter_map(|container| container.last())
+        .collect()
+}
+
 fn parse_operations(instructions: &str) -> Vec<Operation> {
     instructions
         .lines()
-        .filter_map(|line| parse_operation(line).ok())
+        .filter_map(|line| operation::parse(line).ok())
         .map(|(_, operation)| operation)
         .collect()
 }
@@ -121,6 +146,27 @@ mod tests {
             "};
 
             assert_eq!(p1(input), "CMZ");
+        }
+    }
+
+    mod p2 {
+        use crate::p2;
+
+        #[test]
+        fn test_example() {
+            let input = indoc::indoc! {"
+                    [D]
+                [N] [C]
+                [Z] [M] [P]
+                 1   2   3
+
+                move 1 from 2 to 1
+                move 3 from 1 to 3
+                move 2 from 2 to 1
+                move 1 from 1 to 2
+            "};
+
+            assert_eq!(p2(input), "MCD");
         }
     }
 }
