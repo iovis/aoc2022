@@ -28,20 +28,11 @@ fn p2(input: &str) -> usize {
 fn solver(input: &str, window_size: usize) -> usize {
     let input = input.as_bytes();
 
-    for i in 0..(input.len() - window_size) {
-        let mut h = HashSet::with_capacity(window_size);
-
-        for j in 0..window_size {
-            h.insert(input[i + j]);
-        }
-
-        // Found unique values
-        if h.len() == window_size {
-            return i + window_size;
-        }
-    }
-
-    panic!("didn't find the message");
+    input
+        .windows(window_size)
+        .position(|slice| slice.iter().collect::<HashSet<_>>().len() == window_size)
+        .map(|pos| pos + window_size)
+        .unwrap()
 }
 
 #[cfg(test)]
