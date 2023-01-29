@@ -25,55 +25,39 @@ fn p1(input: &str) -> i32 {
         .map(|line| line.split_at(line.len() / 2))
         .map(|(a, b)| {
             (
-                HashSet::<char>::from_iter(a.chars()),
-                HashSet::<char>::from_iter(b.chars()),
+                a.chars().collect::<HashSet<char>>(),
+                b.chars().collect::<HashSet<char>>(),
             )
         })
         .collect_vec() // Seems to be necessary to avoid dangling references
         .iter()
         .flat_map(|(a, b)| a.intersection(b))
-        .map(priority)
+        .map(|c| priority(*c))
         .sum()
-
-    // let mut sum = 0;
-    //
-    // for line in input.lines() {
-    //     let (one, two) = line.split_at(line.len() / 2);
-    //     let one = HashSet::<char>::from_iter(one.chars());
-    //     let two = HashSet::<char>::from_iter(two.chars());
-    //
-    //     let intersection = one.intersection(&two).next().unwrap();
-    //
-    //     sum += priority(intersection);
-    // }
-    //
-    // sum
 }
 
 /// Find the common item between 3 lines
 fn p2(input: &str) -> i32 {
     input
         .lines()
-        .map(|line| HashSet::<char>::from_iter(line.chars()))
-        .collect_vec()
-        .iter()
+        .map(|line| line.chars().collect::<HashSet<char>>())
         .tuples() // Split in groups of 3
-        .map(|(a, b, c)| find_common_badge(a, b, c))
-        .map(|c| priority(&c))
+        .map(|(a, b, c)| find_common_badge(&a, &b, &c))
+        .map(priority)
         .sum()
 }
 
-fn priority(item: &char) -> i32 {
+fn priority(item: char) -> i32 {
     if item.is_lowercase() {
-        *item as i32 - 96
+        item as i32 - 96
     } else {
-        *item as i32 - 64 + 26
+        item as i32 - 64 + 26
     }
 }
 
 fn find_common_badge(a: &HashSet<char>, b: &HashSet<char>, c: &HashSet<char>) -> char {
     let ab = a.intersection(b).copied();
-    let ab = HashSet::<char>::from_iter(ab);
+    let ab = ab.collect::<HashSet<char>>();
 
     *c.intersection(&ab).next().unwrap()
 }
@@ -84,12 +68,12 @@ mod tests {
 
     #[test]
     fn test_priority() {
-        assert_eq!(16, priority(&'p'));
-        assert_eq!(38, priority(&'L'));
-        assert_eq!(42, priority(&'P'));
-        assert_eq!(22, priority(&'v'));
-        assert_eq!(20, priority(&'t'));
-        assert_eq!(19, priority(&'s'));
+        assert_eq!(16, priority('p'));
+        assert_eq!(38, priority('L'));
+        assert_eq!(42, priority('P'));
+        assert_eq!(22, priority('v'));
+        assert_eq!(20, priority('t'));
+        assert_eq!(19, priority('s'));
     }
 
     #[test]
