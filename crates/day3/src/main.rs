@@ -1,6 +1,5 @@
 use color_eyre::Result;
-
-mod slow;
+use day3::slow;
 
 pub fn main() -> Result<()> {
     color_eyre::install()?;

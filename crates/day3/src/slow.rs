@@ -4,6 +4,7 @@ use itertools::Itertools;
 
 /// Find the common item per line
 /// - each line is split in two
+#[must_use]
 pub fn p1(input: &str) -> i32 {
     input
         .lines()
