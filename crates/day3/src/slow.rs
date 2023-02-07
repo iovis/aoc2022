@@ -72,7 +72,7 @@ mod tests {
     }
 
     mod p1 {
-        use crate::slow::p1;
+        use super::p1;
 
         #[test]
         fn test_example() {
@@ -90,7 +90,7 @@ mod tests {
     }
 
     mod p2 {
-        use crate::slow::p2;
+        use super::p2;
 
         #[test]
         fn test_example() {

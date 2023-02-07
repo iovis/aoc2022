@@ -1,15 +1,27 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use day3::slow;
+use day3::{fast, slow};
 
 fn day3_benches(c: &mut Criterion) {
-    let mut group = c.benchmark_group("day3");
-
     let input = std::fs::read_to_string("src/input.txt").unwrap();
 
-    group.bench_function("original", |b| {
+    let mut group = c.benchmark_group("day3.p1");
+    group.bench_function("slow", |b| {
         b.iter(|| slow::p1(black_box(&input)));
     });
 
+    group.bench_function("fast", |b| {
+        b.iter(|| fast::p1(black_box(&input)));
+    });
+    group.finish();
+
+    let mut group = c.benchmark_group("day3.p2");
+    group.bench_function("slow", |b| {
+        b.iter(|| slow::p2(black_box(&input)));
+    });
+
+    group.bench_function("fast", |b| {
+        b.iter(|| fast::p2(black_box(&input)));
+    });
     group.finish();
 }
 

@@ -33,7 +33,7 @@ fn p2(input: &str) -> usize {
         .count()
 }
 
-fn parse_ranges(line: &str) -> (RangeInclusive<i32>, RangeInclusive<i32>){
+fn parse_ranges(line: &str) -> (RangeInclusive<i32>, RangeInclusive<i32>) {
     let ranges = line.split_once(',').unwrap();
 
     // range1
