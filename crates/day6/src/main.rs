@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use color_eyre::Result;
 
 pub fn main() -> Result<()> {
@@ -26,21 +24,39 @@ fn p2(input: &str) -> usize {
 }
 
 fn solver(input: &str, window_size: usize) -> usize {
-    let input = input.as_bytes();
+    // Solution with HashSet
+    //
+    // use std::collections::HashSet;
+    //
+    // input
+    //     .as_bytes()
+    //     .windows(window_size)
+    //     .position(|slice| slice.iter().collect::<HashSet<_>>().len() == window_size)
+    //     .map(|pos| pos + window_size)
+    //     .unwrap()
 
     input
+        .as_bytes()
         .windows(window_size)
-        .position(|slice| slice.iter().collect::<HashSet<_>>().len() == window_size)
-        .map(|pos| pos + window_size)
+        .position(|slice| {
+            let mut state = 0u32;
+
+            for letter in slice {
+                state |= 1 << (letter % 32);
+            }
+
+            window_size == state.count_ones() as usize
+        })
+        .map(|position| position + window_size)
         .unwrap()
 }
 
 #[cfg(test)]
 mod tests {
-    // use super::*;
+    use super::*;
 
     mod p1 {
-        use crate::p1;
+        use super::*;
 
         #[test]
         fn test_example() {
