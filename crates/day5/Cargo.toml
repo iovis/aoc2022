@@ -7,6 +7,6 @@ edition = "2021"
 
 [dependencies]
 color-eyre = "0.6.2"
-indoc = "1.0.8"
+indoc = "2.0.1"
 itertools = "0.10.5"
-nom = "7.1.2"
+nom = "7.1.3"
