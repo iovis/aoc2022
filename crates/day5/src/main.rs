@@ -77,7 +77,6 @@ fn parse_containers(input: &str) -> Vec<Vec<char>> {
     // upside down
     let containers: Vec<Vec<char>> = input
         .split('\n')
-        .into_iter()
         .rev()
         .map(|line| line.chars().collect())
         .collect();
