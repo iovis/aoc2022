@@ -81,8 +81,6 @@ fn do_ranges_overlap(a: &RangeInclusive<i32>, b: &RangeInclusive<i32>) -> bool {
 mod tests {
     use crate::is_any_range_fully_contained;
 
-    use super::*;
-
     #[test]
     fn test_range_overlap() {
         let a = 2..=4;
