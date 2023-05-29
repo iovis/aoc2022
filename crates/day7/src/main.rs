@@ -1,4 +1,4 @@
-use id_tree::{Node, Tree};
+use id_tree::{InsertBehavior, Node, Tree};
 
 use crate::file_system_entry::{Directory, FileSystemEntry};
 
@@ -14,26 +14,73 @@ fn main() {
     println!("a1 = {a1}");
 }
 
+/// find all of the directories with a total size of at most 100000, then calculate the sum of
+/// their total sizes. You can count directories more than once
 fn p1(input: &str) -> usize {
     let (_, commands) = parse_commands(input).unwrap();
 
-    dbg!(commands);
-
     let mut tree = Tree::new();
+    let root_id = tree
+        .insert(
+            Node::new(FileSystemEntry::Directory(Directory {
+                name: "/".to_string(),
+            })),
+            InsertBehavior::AsRoot,
+        )
+        .unwrap();
 
-    tree.insert(
-        Node::new(FileSystemEntry::Directory(Directory {
-            name: "/".to_string(),
-        })),
-        id_tree::InsertBehavior::AsRoot,
-    )
-    .unwrap();
+    let mut current_node_id = root_id;
 
-    let current_node = tree.root_node_id().unwrap();
+    for command in commands {
+        match command {
+            interpreter::Command::CdRoot => current_node_id = tree.root_node_id().unwrap().clone(),
+            interpreter::Command::CdParent => {
+                current_node_id = tree
+                    .get(&current_node_id)
+                    .unwrap()
+                    .parent()
+                    .unwrap()
+                    .clone();
+            }
+            interpreter::Command::Cd(new_dir) => {
+                // Find new directory from the children of the current one
+                current_node_id = tree
+                    .children_ids(&current_node_id)
+                    .unwrap()
+                    .filter_map(|node_id| {
+                        let node = tree.get(node_id).unwrap();
 
-    dbg!(tree);
+                        match node.data() {
+                            FileSystemEntry::Directory(dir) => Some((node_id, dir)),
+                            FileSystemEntry::File(_) => None,
+                        }
+                    })
+                    .find(|(_node_id, dir)| *dir == &new_dir)
+                    .map(|(node_id, _)| node_id)
+                    .unwrap()
+                    .clone();
+            }
+            interpreter::Command::Ls(entries) => {
+                for entry in entries {
+                    tree.insert(
+                        Node::new(entry),
+                        InsertBehavior::UnderNode(&current_node_id),
+                    )
+                    .unwrap();
+                }
+            }
+        }
+    }
+
+    print_tree(&tree);
 
     todo!()
+}
+
+fn print_tree<T: std::fmt::Debug>(tree: &Tree<T>) {
+    let mut s = String::new();
+    tree.write_formatted(&mut s).unwrap();
+    println!("{s}");
 }
 
 #[cfg(test)]
