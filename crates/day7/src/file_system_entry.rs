@@ -14,13 +14,13 @@ impl std::fmt::Debug for FileSystemEntry {
 }
 
 // TODO: Use references
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct Directory {
     pub name: String,
     // size: usize?
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct File {
     pub name: String,
     pub size: usize,
