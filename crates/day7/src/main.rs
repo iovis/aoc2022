@@ -6,6 +6,7 @@ use self::interpreter::parse_commands;
 
 mod file_system_entry;
 mod interpreter;
+mod tree;
 
 fn main() {
     let input = include_str!("input.txt");
@@ -72,27 +73,28 @@ fn p1(input: &str) -> usize {
         }
     }
 
-    print_tree(&tree);
+    // tree::pretty_print(&tree);
 
-    todo!()
-}
+    let root = tree.get(tree.root_node_id().unwrap()).unwrap();
+    let mut dir_sizes = vec![];
+    tree::calculate_dir_sizes(&tree, root, &mut dir_sizes);
 
-fn print_tree<T: std::fmt::Debug>(tree: &Tree<T>) {
-    let mut s = String::new();
-    tree.write_formatted(&mut s).unwrap();
-    println!("{s}");
+    // println!("{dir_sizes:#?}");
+
+    dir_sizes
+        .iter()
+        .map(|x| x.1)
+        .filter(|size| *size < 100_000)
+        .sum()
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    mod p1 {
-        use super::*;
-
-        #[test]
-        fn p1_example() {
-            let input = indoc::indoc! {"
+    #[test]
+    fn p1_example() {
+        let input = indoc::indoc! {"
                 $ cd /
                 $ ls
                 dir a
@@ -118,7 +120,6 @@ mod tests {
                 7214296 k
             "};
 
-            assert_eq!(p1(input), 95437);
-        }
+        assert_eq!(p1(input), 95437);
     }
 }
