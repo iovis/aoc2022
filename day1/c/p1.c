@@ -1,7 +1,22 @@
 #include "p1.h"
 
+#include "base.h"
+#include "parser.h"
+#include <stdint.h>
+
 uint64_t p1(const char *input) {
-  return 123;
+  uint64_t max = 0;
+  const char *group = input;
+
+  while (true) {
+    ResultParseGroup result = parse_group(group);
+    if (!result.ok) break;
+
+    if (result.group > max) max = result.group;
+    group = result.rest;
+  }
+
+  return max;
 }
 
 #ifdef TEST
@@ -23,6 +38,6 @@ void p1_tests(void) {
                       "\n"
                       "10000\n";
 
-  assert(p1(input) == 72511);
+  assert(p1(input) == 24000);
 }
 #endif
