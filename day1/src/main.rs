@@ -1,11 +1,11 @@
 use itertools::Itertools;
 
 fn main() {
-    // tracing_subscriber::fmt::init();
+    tracing_subscriber::fmt::init();
 
     let input = include_str!("../input.txt");
 
-    // println!("p1 = {:?}", p1(input));
+    println!("p1 = {:?}", p1(input));
     println!("p2 = {:?}", p2(input));
 }
 

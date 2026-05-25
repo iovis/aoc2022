@@ -11,7 +11,7 @@ static const char input[] = {
 };
 
 int main(void) {
-  // printf("p1 = %lu\n", p1(input));
+  printf("p1 = %lu\n", p1(input));
   printf("p2 = %lu\n", p2(input));
 
   return 0;

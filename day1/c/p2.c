@@ -2,36 +2,35 @@
 
 #include "base.h"
 #include "parser.h"
-#include "stb_ds.h"
-#include <stddefer.h>
 #include <stdint.h>
-#include <stdlib.h>
+#include <string.h>
 
-// Sort in reverse order
-static int u64cmp_reverse(const void *a, const void *b) {
-  const uint64_t *aa = a;
-  const uint64_t *bb = b;
+static void insert_if_top(size_t len, uint64_t groups[static len], uint64_t group) {
+  for (size_t i = 0; i < len; i++) {
+    if (group > groups[i]) {
+      if (i < len - 1) {
+        // shift the rest of the elements right by 1
+        memmove(&groups[i + 1], &groups[i], (len - (i + 1)) * sizeof(groups[0]));
+      }
 
-  return (*aa < *bb) - (*aa > *bb);
+      groups[i] = group;
+      return;
+    }
+  }
 }
 
 uint64_t p2(const char *input) {
-  uint64_t *groups = nullptr;
+  uint64_t groups[3] = {0};
   const char *group = input;
-  defer arrfree(groups);
 
   while (true) {
     ResultParseGroup result = parse_group(group);
     if (!result.ok) break;
 
-    arrpush(groups, result.group);
+    insert_if_top(3, groups, result.group);
 
     group = result.rest;
   }
-
-  qsort(groups, arrlen(groups), sizeof(*groups), u64cmp_reverse);
-
-  expect(arrlen(groups) >= 3);
 
   uint64_t total = 0;
   for (int i = 0; i < 3; i++) {
