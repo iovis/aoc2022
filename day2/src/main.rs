@@ -17,13 +17,9 @@ use color_eyre::Result;
 pub fn main() -> Result<()> {
     color_eyre::install()?;
 
-    let input = include_str!("input.txt");
-
-    let a1 = p1(input);
-    println!("{a1:?}");
-
-    let a2 = p2(input);
-    println!("{a2:?}");
+    let input = include_str!("../input.txt");
+    println!("p1 = {}", p1(input));
+    println!("p2 = {}", p2(input));
 
     Ok(())
 }
