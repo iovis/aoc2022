@@ -1,4 +1,4 @@
-#include "p1.h"
+#include "p2.h"
 
 #include "base.h"
 #include "bitmap.h"
@@ -8,28 +8,28 @@
 #include <string.h>
 #include <strings.h>
 
-uint64_t p1(const char *input) {
+uint64_t p2(const char *input) {
   const char *line = input;
   uint64_t total = 0;
 
   while (*line) {
-    size_t delim = strcspn(line, "\n");
-    size_t half = delim / 2;
+    uint64_t priorities = ~0; // all 1s
 
-    uint64_t first = parse_line(half, &line[0]);
-    uint64_t second = parse_line(half, &line[half]);
-    uint64_t common = first & second;
+    for (int i = 0; i < 3; i++) {
+      expect(*line, "we haven't run out of groups");
+      size_t delim = strcspn(line, "\n");
+      priorities &= parse_line(delim, &line[0]);
+      line = line + delim + 1;
+    }
 
-    expect(common != 0, "At least 1 bit set");
-    expect((common & (common - 1)) == 0, "Only 1 bit set");
+    expect(priorities != 0, "At least 1 bit set");
+    expect((priorities & (priorities - 1)) == 0, "Only 1 bit set");
 
     // Find First (bit) Set - CPU instruction
     // 1-based, 0 if not found
-    int priority = ffsll(common);
+    int priority = ffsll(priorities);
 
     total += priority;
-
-    line = line + delim + 1;
   }
 
   return total;
@@ -38,7 +38,7 @@ uint64_t p1(const char *input) {
 #ifdef TEST
 #include <assert.h>
 
-void p1_tests(void) {
+void p2_tests(void) {
   const char *input = "vJrwpWtwJgWrhcsFMMfFFhFp\n"
                       "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\n"
                       "PmmdzqPrVvPwwTWBwg\n"
@@ -46,6 +46,6 @@ void p1_tests(void) {
                       "ttgJtRGJQctTZtZT\n"
                       "CrZsJsPPZsGzwwsLwLmpwMDw\n";
 
-  assert(p1(input) == 157);
+  assert(p2(input) == 70);
 }
 #endif
