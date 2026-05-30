@@ -1,8 +1,25 @@
 #include "p1.h"
+#include "base.h"
+#include "parser.h"
+#include "range.h"
 
 uint64_t p1(const char *input) {
-  (void)input;
-  return 0;
+  const char *line = input;
+  ParseResult result = {0};
+  uint64_t total = 0;
+
+  while (true) {
+    result = parse_ranges(line);
+    if (!result.ok) break;
+
+    if (range_fully_contained(&result.first, &result.second)) {
+      total++;
+    }
+
+    line = result.rest;
+  }
+
+  return total;
 }
 
 #ifdef TEST

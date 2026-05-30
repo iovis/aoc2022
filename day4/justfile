@@ -55,12 +55,12 @@ watch_test:
 
 alias d := debug
 debug *args: build_debug
-    ASAN_OPTIONS=detect_leaks=0 lldb -o "b main" -o "run" -- {{ debug_bin }} {{ args }}
+    ASAN_OPTIONS=detect_leaks=0 gdb -q -ex "b main" -ex "run" --args {{ debug_bin }} {{ args }}
 
 alias dt := debug_test
 [positional-arguments]
 debug_test *args: build_test
-    ASAN_OPTIONS=detect_leaks=0 lldb "$@" -- {{ test_bin }}
+    ASAN_OPTIONS=detect_leaks=0 gdb -q "$@" --args {{ test_bin }}
 
 alias v := valgrind
 valgrind *args: build_valgrind
