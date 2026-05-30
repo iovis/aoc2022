@@ -1,13 +1,16 @@
 #include "parser.h"
 #include "base.h"
-#include <ctype.h>
+
+static bool is_digit(char c) {
+  return c >= '0' && c <= '9';
+}
 
 static uint64_t parse_number(const char *line[]) {
   const char *ptr = *line;
-  expect(isdigit(*ptr), "must be a number");
+  expect(is_digit(*ptr), "must be a number");
   uint64_t number = 0;
 
-  while (isdigit(*ptr)) {
+  while (is_digit(*ptr)) {
     number = 10 * number + *ptr - '0';
     ptr++;
   }
@@ -27,7 +30,7 @@ ParseResult parse_ranges(const char *input) {
   ParseResult result = (ParseResult){.rest = input};
   const char *ptr = input;
 
-  if (!*ptr || !isdigit(*ptr)) return (ParseResult){0};
+  if (!*ptr || !is_digit(*ptr)) return (ParseResult){0};
 
   while (*ptr && *ptr != '\n') {
     result.first.start = parse_number(&ptr);
