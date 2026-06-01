@@ -16,6 +16,12 @@ typedef struct {
 } Operation;
 
 typedef struct {
+  Operation operation;
+  const char *rest;
+  bool ok;
+} ParseOperationResult;
+
+typedef struct {
   // [owned]: arrfree(result.operations)
   Operation *operations;
   const char *rest;
@@ -23,6 +29,7 @@ typedef struct {
 } ParseOperationsResult;
 
 ParseContainersResult parse_containers(const char *input);
+ParseOperationResult parse_operation(const char *line);
 ParseOperationsResult parse_operations(const char *input);
 
 #ifdef TEST

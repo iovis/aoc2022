@@ -13,19 +13,22 @@ String p1(const char *input) {
   String *containers = containers_result.containers;
   defer string_array_free(containers);
 
-  ParseOperationsResult operations_result = parse_operations(containers_result.rest);
-  expect(operations_result.ok);
-  Operation *operations = operations_result.operations;
-  defer arrfree(operations);
+  const char *line = containers_result.rest;
+  while (true) {
+    ParseOperationResult operation_result = parse_operation(line);
+    if (!operation_result.ok) break;
 
-  for (ptrdiff_t i = 0; i < arrlen(operations); i++) {
-    for (size_t j = 0; j < operations[i].amount; j++) {
-      char container = string_pop(&containers[operations[i].from]);
-      string_append_char(&containers[operations[i].to], container);
+    Operation operation = operation_result.operation;
+
+    for (size_t j = 0; j < operation.amount; j++) {
+      char container = string_pop(&containers[operation.from]);
+      string_append_char(&containers[operation.to], container);
     }
+
+    line = operation_result.rest;
   }
 
-  String result = string_new(arrlen(containers));
+  String result = string_new(64);
   for (ptrdiff_t i = 0; i < arrlen(containers); i++) {
     char container = string_pop(&containers[i]);
     string_append_char(&result, container);

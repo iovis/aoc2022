@@ -78,6 +78,36 @@ ParseContainersResult parse_containers(const char *input) {
   return result;
 }
 
+ParseOperationResult parse_operation(const char *line) {
+  ParseOperationResult result = {
+      .operation = {0},
+      .rest = line,
+  };
+
+  const char *ptr = line;
+
+  if (!parse_consume(&ptr, "move ")) return result;
+  result.operation.amount = parse_number(&ptr);
+  if (!result.operation.amount) return result;
+
+  if (!parse_consume(&ptr, " from ")) return result;
+  result.operation.from = parse_number(&ptr);
+  if (!result.operation.from) return result;
+  result.operation.from -= 1;
+
+  if (!parse_consume(&ptr, " to ")) return result;
+  result.operation.to = parse_number(&ptr);
+  if (!result.operation.to) return result;
+  result.operation.to--;
+
+  if (!parse_consume(&ptr, "\n")) return result;
+
+  result.ok = true;
+  result.rest = ptr;
+
+  return result;
+}
+
 ParseOperationsResult parse_operations(const char *input) {
   ParseOperationsResult result = {
       .operations = nullptr,
@@ -87,25 +117,11 @@ ParseOperationsResult parse_operations(const char *input) {
   const char *ptr = input;
 
   while (*ptr) {
-    Operation operation = {0};
+    ParseOperationResult operation_result = parse_operation(ptr);
+    if (!operation_result.ok) return result;
 
-    if (!parse_consume(&ptr, "move ")) return result;
-    operation.amount = parse_number(&ptr);
-    if (!operation.amount) return result;
-
-    if (!parse_consume(&ptr, " from ")) return result;
-    operation.from = parse_number(&ptr);
-    if (!operation.from) return result;
-    operation.from -= 1;
-
-    if (!parse_consume(&ptr, " to ")) return result;
-    operation.to = parse_number(&ptr);
-    if (!operation.to) return result;
-    operation.to--;
-
-    if (!parse_consume(&ptr, "\n")) return result;
-
-    arrput(result.operations, operation);
+    arrput(result.operations, operation_result.operation);
+    ptr = operation_result.rest;
   }
 
   result.ok = true;
