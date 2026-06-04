@@ -30,6 +30,7 @@ void string_append_char(String *self, char c);
 // Precondition: str->ptr must not point into self->cstr
 void string_append_str(String *self, const str_t *str);
 char string_pop(String *self);
+void string_chop(String *self, size_t n);
 
 void string_clear(String *self);
 void string_free(String *self);

@@ -137,6 +137,18 @@ char string_pop(String *self) {
   return c;
 }
 
+void string_chop(String *self, size_t n) {
+  if (self->capacity == 0) return;
+
+  if (n >= self->len) {
+    self->len = 0;
+  } else {
+    self->len -= n;
+  }
+
+  self->cstr[self->len] = '\0';
+}
+
 void string_clear(String *self) {
   if (self->capacity == 0) return;
 
@@ -228,6 +240,11 @@ static void string_test(void) {
   assert(string.len == 21);
   assert(string.capacity == 24);
   assert(strcmp(string.cstr, "this is a test\nHello!") == 0);
+
+  string_chop(&string, 6);
+  assert(string.len == 15);
+  assert(string.capacity == 24);
+  assert(strcmp(string.cstr, "this is a test\n") == 0);
 }
 
 void string_tests(void) {

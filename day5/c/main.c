@@ -1,6 +1,7 @@
 #include "lib.h"
 
 #include "p1.h"
+#include "p2.h"
 #include "str.h"
 
 #include <stddefer.h>
@@ -16,7 +17,11 @@ int main(void) {
   defer string_free(&p1_result);
 
   printf("p1 = %s\n", p1_result.cstr);
-  // printf("p2 = %lu\n", p2(input).str);
+
+  String p2_result = p2(input);
+  defer string_free(&p2_result);
+
+  printf("p2 = %s\n", p2_result.cstr);
 
   return 0;
 }
